@@ -43,7 +43,7 @@ static float b[COLS] = {
 // the table with the modification values for the multi-pieces
 static float jr[JITTERS] = {
    0.0f,
-  -0.3f,  0.3f, -0.3f,  0.3f, -0.3f,  0.3f, -0.3f,  0.3f,  0.3f,
+  -0.5f,  0.5f, -0.5f,  0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,
   -0.3f, -0.3f,  0.3f,  0.3f, -0.3f, -0.3f,  0.3f,  0.0f,  0.0f,
    0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.3f, -0.3f,
   -0.4f,  0.4f, -0.4f,  0.4f, -0.4f,  0.4f, -0.4f,  0.4f,  0.4f,
@@ -52,7 +52,7 @@ static float jr[JITTERS] = {
 };
 static float jg[JITTERS] = {
    0.0f,
-  -0.3f,  0.3f,  0.3f, -0.3f, -0.3f,  0.3f,  0.3f, -0.3f,  0.3f,
+  0.5f,  -0.5f, 0.5f,  -0.5f, 0.5f,  -0.5f, 0.5f,  -0.5f,  -0.5f,
   -0.3f,  0.3f, -0.3f,  0.0f,  0.0f,  0.0f,  0.0f,  0.3f, -0.3f,
   -0.3f,  0.3f,  0.0f,  0.0f,  0.3f, -0.3f,  0.0f,  0.0f,
   -0.4f,  0.4f,  0.4f, -0.4f, -0.4f,  0.4f,  0.4f, -0.4f,  0.4f,
@@ -61,7 +61,7 @@ static float jg[JITTERS] = {
 };
 static float jb[JITTERS] = {
    0.0f,
-  -0.3f,  0.3f,  0.3f, -0.3f,  0.3f, -0.3f, -0.3f,  0.3f,  0.0f,
+  -0.5f,  0.5f, -0.5f,  0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,
    0.0f,  0.0f,  0.0f,  0.3f, -0.3f,  0.3f, -0.3f,  0.3f, -0.3f,
    0.3f, -0.3f,  0.3f, -0.3f,  0.0f,  0.0f,  0.0f,  0.0f,
   -0.4f,  0.4f,  0.4f, -0.4f,  0.4f, -0.4f, -0.4f,  0.4f,  0.0f,
@@ -161,7 +161,7 @@ float pieceColorR(int x, int sub) {
   float jitter = jr[getJitter(x, sub)];
   float val = pieceColorR(x);
 
-  return val + jitter*0.5*ramp(val);
+  return val + jitter;
 }
 
 float pieceColorG(int x, int sub) {
@@ -169,7 +169,7 @@ float pieceColorG(int x, int sub) {
   float jitter = jg[getJitter(x, sub)];
   float val = pieceColorG(x);
 
-  return val + jitter*0.4*ramp(val);
+  return val + jitter;
 }
 
 float pieceColorB(int x, int sub) {
@@ -177,7 +177,7 @@ float pieceColorB(int x, int sub) {
   float jitter = jb[getJitter(x, sub)];
   float val = pieceColorB(x);
 
-  return val + jitter*0.7*ramp(val);
+  return val + jitter;
 }
 
 unsigned int pieceColorRi(int x, int sub) {
@@ -185,7 +185,7 @@ unsigned int pieceColorRi(int x, int sub) {
   float jitter = jr[getJitter(x, sub)];
   float val = pieceColorR(x);
 
-  return (unsigned int)((val + jitter*0.5*ramp(val))*255);
+  return (unsigned int)((val + jitter)*255);
 }
 
 unsigned int pieceColorGi(int x, int sub) {
@@ -193,7 +193,7 @@ unsigned int pieceColorGi(int x, int sub) {
   float jitter = jg[getJitter(x, sub)];
   float val = pieceColorG(x);
 
-  return (unsigned int)((val + jitter*0.4*ramp(val))*255);
+  return (unsigned int)((val + jitter)*255);
 }
 
 unsigned int pieceColorBi(int x, int sub) {
@@ -201,11 +201,14 @@ unsigned int pieceColorBi(int x, int sub) {
   float jitter = jb[getJitter(x, sub)];
   float val = pieceColorB(x);
 
-  return (unsigned int)((val + jitter*0.7*ramp(val))*255);
+  return (unsigned int)((val + jitter)*255);
 }
 
-float darkPieceColor(float f) { return float(f * 0.9); }
-float lightPieceColor(float f) { return float(1 - (0.9 * (1-f))); }
+/* float darkPieceColor(float f) { return float(f * 0.9); } */
+/* float lightPieceColor(float f) { return float(1 - (0.9 * (1-f))); } */
+
+float darkPieceColor(float f) { return float(f); }
+float lightPieceColor(float f) { return float(f); }
 
 Fl_Color contrastPieceColor(int x) {
   if (3*pieceColorRi(x) + 6*pieceColorGi(x) + pieceColorBi(x) < 1275)

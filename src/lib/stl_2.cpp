@@ -43,7 +43,7 @@ Polyhedron * stlExporter_2_c::getMesh(const voxel_c & v, const faceList_c & /* n
   // check cast, otherwise a non voxel_2_c class was given, which is wrong in this case
   bt_assert(v2);
 
-  return v2->getMesh(sphere_rad, connection_rad, round, offset, (int)recursion, inner_rad, (square_hole?-1:1)*hole_diam);
+  return v2->getMesh2(sphere_rad, connection_rad, round, offset, (int)recursion, inner_rad, (square_hole?-1:1)*hole_diam);
 }
 
 

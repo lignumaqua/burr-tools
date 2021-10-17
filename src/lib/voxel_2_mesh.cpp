@@ -1026,7 +1026,7 @@ static bool curvOk(float curvrad, float cnrad, float sprad, float offset)
   return true;
 }
 
-Polyhedron * voxel_2_c::getMeshInternal(float sphere_rad, float connection_rad, float round, float offset, int recursion, float inner_rad, float hole_diam, bool fast) const
+Polyhedron * voxel_2_c::getMeshInternal2(float sphere_rad, float connection_rad, float round, float offset, int recursion, float inner_rad, float hole_diam, bool fast) const
 {
   Polyhedron * poly = new Polyhedron;
   vertexList_c vl(poly);
@@ -1123,15 +1123,15 @@ Polyhedron * voxel_2_c::getMeshInternal(float sphere_rad, float connection_rad, 
   return poly;
 }
 
-Polyhedron * voxel_2_c::getMesh(float sphere_rad, float connection_rad, float round, float offset, int recursion, float inner_rad, float hole_diam) const
+Polyhedron * voxel_2_c::getMesh2(float sphere_rad, float connection_rad, float round, float offset, int recursion, float inner_rad, float hole_diam) const
 {
-  return getMeshInternal(
+  return getMeshInternal2(
       sphere_rad, connection_rad, round, offset, recursion, inner_rad, hole_diam, false);
 }
 
 Polyhedron * voxel_2_c::getDrawingMesh(void) const
 {
-  return getMeshInternal(
+  return getMeshInternal2(
       0.5,  // sphere radius
       0.7,  // connection radius
       1,    // round
