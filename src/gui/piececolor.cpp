@@ -44,8 +44,8 @@ static float b[COLS] = {
 static float jr[JITTERS] = {
    0.0f,
   -0.5f,  0.5f, -0.5f,  0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,
-  -0.3f, -0.3f,  0.3f,  0.3f, -0.3f, -0.3f,  0.3f,  0.0f,  0.0f,
-   0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.3f, -0.3f,
+  -0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,
+   0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.5f, -0.5f,
   -0.4f,  0.4f, -0.4f,  0.4f, -0.4f,  0.4f, -0.4f,  0.4f,  0.4f,
   -0.4f, -0.4f,  0.4f,  0.4f, -0.4f, -0.4f,  0.4f,  0.0f,  0.0f,
    0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.0f,  0.4f, -0.4f
@@ -156,6 +156,130 @@ static float ramp(float val) {
   return 0.5+0.5*fabs(1-2*val);
 }
 
+
+
+
+float max(float a, float b, float c) {
+   return ((a > b)? (a > c ? a : c) : (b > c ? b : c));
+}
+float min(float a, float b, float c) {
+   return ((a < b)? (a < c ? a : c) : (b < c ? b : c));
+}
+
+void rgb_to_hsv(float r, float g, float b, float *add_h, float *add_s, float *add_v) {
+   float cmax = max(r, g, b); // maximum of r, g, b
+   float cmin = min(r, g, b); // minimum of r, g, b
+   float diff = cmax-cmin; // diff of cmax and cmin.
+   if (cmax == cmin){
+      *add_h = 0;
+   }
+   else if (cmax == r){
+      *add_h = fmod((60 * ((g - b) / diff) + 360), 360.0);
+   }
+   else if (cmax == g){
+      *add_h = fmod((60 * ((b - r) / diff) + 120), 360.0);
+   }
+   else if (cmax == b){
+      *add_h = fmod((60 * ((r - g) / diff) + 240), 360.0);
+   }
+   // if cmax equal zero
+      if (cmax == 0) {
+         *add_s = 0;
+      }
+      else {
+         *add_s = (diff / cmax);
+      }
+   // compute v
+   *add_v = cmax;
+}
+
+void hsv_to_rgb(float h, float s, float v, float *add_r, float *add_g, float *add_b){
+    float C = s*v;
+    float X = C*(1-abs(fmod(h/60.0, 2)-1));
+    float m = v-C;
+    float r,g,b;
+    if(h >= 0 && h < 60){
+        r = C,g = X,b = 0;
+    }
+    else if(h >= 60 && h < 120){
+        r = X,g = C,b = 0;
+    }
+    else if(h >= 120 && h < 180){
+        r = 0,g = C,b = X;
+    }
+    else if(h >= 180 && h < 240){
+        r = 0,g = X,b = C;
+    }
+    else if(h >= 240 && h < 300){
+        r = X,g = 0,b = C;
+    }
+    else{
+        r = C,g = 0,b = X;
+    }
+    *add_r = r+m;
+    *add_g = g+m;
+    *add_b = b+m;
+}
+
+float pieceColorR(int x, int sub) {
+  
+  float r = pieceColorR(x);
+  float g = pieceColorG(x);
+  float b = pieceColorB(x);
+
+  float h, s, v;
+  rgb_to_hsv(r, g, b, &h, &s, &v);
+  s = s - fmod((sub-1)/10.0,1);
+  h = h + (10 * int((sub-1)/ 5.0));
+  h = h / 360;
+  h = h - int(h);
+  h = h * 360;
+    hsv_to_rgb(h, s, v, &r, &g, &b);
+
+  return r;
+}
+
+float pieceColorG(int x, int sub) {
+  
+  float r = pieceColorR(x);
+  float g = pieceColorG(x);
+  float b = pieceColorB(x);
+
+  float h, s, v;
+  rgb_to_hsv(r, g, b, &h, &s, &v);
+  s = s - fmod((sub-1)/10.0,1);
+  h = h + (10 * int((sub-1)/ 5.0));
+  h = h / 360;
+  h = h - int(h);
+  h = h * 360;
+  hsv_to_rgb(h, s, v, &r, &g, &b);
+
+  return g;
+}
+
+float pieceColorB(int x, int sub) {
+  
+  float r = pieceColorR(x);
+  float g = pieceColorG(x);
+  float b = pieceColorB(x);
+
+  float h, s, v;
+  rgb_to_hsv(r, g, b, &h, &s, &v);
+  s = s - fmod((sub-1)/10.0,1);
+  h = h + (10 * int((sub-1)/ 5.0));
+  h = h / 360;
+  h = h - int(h);
+  h = h * 360;
+  hsv_to_rgb(h, s, v, &r, &g, &b);
+
+  return b;
+}
+
+
+
+
+
+/*
 float pieceColorR(int x, int sub) {
 
   float jitter = jr[getJitter(x, sub)];
@@ -179,6 +303,8 @@ float pieceColorB(int x, int sub) {
 
   return val + jitter;
 }
+
+*/
 
 unsigned int pieceColorRi(int x, int sub) {
 
