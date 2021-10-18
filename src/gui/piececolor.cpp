@@ -166,6 +166,10 @@ float min(float a, float b, float c) {
    return ((a < b)? (a < c ? a : c) : (b < c ? b : c));
 }
 
+/* Convert rgb values of voxel color to hsv
+ * Use references to allow returning 3 values
+ */
+
 void rgb_to_hsv(float r, float g, float b, float *add_h, float *add_s, float *add_v) {
    float cmax = max(r, g, b); // maximum of r, g, b
    float cmin = min(r, g, b); // minimum of r, g, b
@@ -192,6 +196,11 @@ void rgb_to_hsv(float r, float g, float b, float *add_h, float *add_s, float *ad
    // compute v
    *add_v = cmax;
 }
+
+
+/* Convert hsv values of voxel color to rgb
+ * Use references to allow returning 3 values
+ */
 
 void hsv_to_rgb(float h, float s, float v, float *add_r, float *add_g, float *add_b){
     float C = s*v;
@@ -221,6 +230,13 @@ void hsv_to_rgb(float h, float s, float v, float *add_r, float *add_g, float *ad
     *add_b = b+m;
 }
 
+
+/* For each of R, G, and B for multiple identical parts. Convert color to hsv
+ * Then modify hue and saturation for subsequent pieces using the count, sub.
+ * Ensure we don't over or underflow. Hue valid from 0 - 360, saturation  valid from 0 - 1.
+ * One option. Decrement saturation by 0.1 every step, incrment hue by 10 every 10 steps.
+ */
+
 float pieceColorR(int x, int sub) {
   
   float r = pieceColorR(x);
@@ -229,12 +245,10 @@ float pieceColorR(int x, int sub) {
 
   float h, s, v;
   rgb_to_hsv(r, g, b, &h, &s, &v);
-  s = s - fmod((sub-1)/10.0,1);
-  h = h + (10 * int((sub-1)/ 5.0));
-  h = h / 360;
-  h = h - int(h);
-  h = h * 360;
-    hsv_to_rgb(h, s, v, &r, &g, &b);
+  s = s - fmod((sub)/5.0,1);
+  if (s<0) { s = s + 1; }
+  h = fmod(h + 10.0 * int(sub / 5.0), 360.0);
+  hsv_to_rgb(h, s, v, &r, &g, &b);
 
   return r;
 }
@@ -247,11 +261,9 @@ float pieceColorG(int x, int sub) {
 
   float h, s, v;
   rgb_to_hsv(r, g, b, &h, &s, &v);
-  s = s - fmod((sub-1)/10.0,1);
-  h = h + (10 * int((sub-1)/ 5.0));
-  h = h / 360;
-  h = h - int(h);
-  h = h * 360;
+  s = s - fmod((sub)/5.0,1);
+  if (s<0) { s = s + 1; }
+  h = fmod(h + 10.0 * int(sub / 5.0), 360.0);
   hsv_to_rgb(h, s, v, &r, &g, &b);
 
   return g;
@@ -265,11 +277,9 @@ float pieceColorB(int x, int sub) {
 
   float h, s, v;
   rgb_to_hsv(r, g, b, &h, &s, &v);
-  s = s - fmod((sub-1)/10.0,1);
-  h = h + (10 * int((sub-1)/ 5.0));
-  h = h / 360;
-  h = h - int(h);
-  h = h * 360;
+  s = s - fmod((sub)/5.0,1);
+  if (s<0) { s = s + 1; }
+  h = fmod(h + 10.0 * int(sub / 5.0), 360.0);
   hsv_to_rgb(h, s, v, &r, &g, &b);
 
   return b;
@@ -308,26 +318,26 @@ float pieceColorB(int x, int sub) {
 
 unsigned int pieceColorRi(int x, int sub) {
 
-  float jitter = jr[getJitter(x, sub)];
-  float val = pieceColorR(x);
+  //float jitter = jr[getJitter(x, sub)];
+  float val = pieceColorR(x,sub);
 
-  return (unsigned int)((val + jitter)*255);
+  return (unsigned int)((val)*255);
 }
 
 unsigned int pieceColorGi(int x, int sub) {
 
-  float jitter = jg[getJitter(x, sub)];
-  float val = pieceColorG(x);
+  //float jitter = jg[getJitter(x, sub)];
+  float val = pieceColorG(x,sub);
 
-  return (unsigned int)((val + jitter)*255);
+  return (unsigned int)((val)*255);
 }
 
 unsigned int pieceColorBi(int x, int sub) {
 
-  float jitter = jb[getJitter(x, sub)];
-  float val = pieceColorB(x);
+  //float jitter = jb[getJitter(x, sub)];
+  float val = pieceColorB(x,sub);
 
-  return (unsigned int)((val + jitter)*255);
+  return (unsigned int)((val)*255);
 }
 
 /* float darkPieceColor(float f) { return float(f * 0.9); } */
